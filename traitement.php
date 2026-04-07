@@ -1,16 +1,7 @@
 <?php
 // Connexion à la base de données
-$serveur = 'localhost';
-$utilisateur = 'root';
-$motdepasse = '';
-$basedonnees = 'oeuvres_db';
-
-try {
-    $connexion = new PDO("mysql:host=$serveur;dbname=$basedonnees", $utilisateur, $motdepasse);
-    $connexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die('Erreur de connexion : ' . $e->getMessage());
-}
+require 'bdd.php'; // Inclure le fichier de connexion
+$connexion = connexion(); // Utiliser la fonction de connexion
 
 // Inclure le fichier oeuvres.php pour accéder aux œuvres initiales
 require 'oeuvres.php';
@@ -43,8 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $image = htmlspecialchars(trim($_POST['image'] ?? ''));
     $description = htmlspecialchars(trim($_POST['description'] ?? ''));
 
-    // Vérifier que les champs obligatoires sont remplis
-    if (!empty($titre) && !empty($artiste)) {
+    // Vérifier que les champs obligatoires sont remplis et valides
+    if (!empty($titre) && !empty($artiste) && strlen($description) >= 3 && filter_var($image, FILTER_VALIDATE_URL) && strpos($image, 'https://') === 0) {
         try {
             // Préparer et exécuter la requête d'insertion
             $requete = $connexion->prepare('INSERT INTO oeuvres (titre, artiste, image, description) VALUES (:titre, :artiste, :image, :description)');
