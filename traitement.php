@@ -3,30 +3,6 @@
 require 'bdd.php'; // Inclure le fichier de connexion
 $connexion = connexion(); // Utiliser la fonction de connexion
 
-// Inclure le fichier oeuvres.php pour accéder aux œuvres initiales
-require 'oeuvres.php';
-
-// Insérer les œuvres initiales si elles ne sont pas déjà présentes
-foreach ($oeuvres as $oeuvre) {
-    // Vérifier si l'œuvre existe déjà
-    $stmt = $connexion->prepare('SELECT id FROM oeuvres WHERE titre = :titre AND artiste = :artiste');
-    $stmt->execute([
-        ':titre' => $oeuvre['titre'],
-        ':artiste' => $oeuvre['artiste']
-    ]);
-    
-    if (!$stmt->fetch()) {
-        // Insérer l'œuvre si elle n'existe pas
-        $insert = $connexion->prepare('INSERT INTO oeuvres (titre, artiste, image, description) VALUES (:titre, :artiste, :image, :description)');
-        $insert->execute([
-            ':titre' => $oeuvre['titre'],
-            ':artiste' => $oeuvre['artiste'],
-            ':image' => $oeuvre['image'],
-            ':description' => $oeuvre['description']
-        ]);
-    }
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer les données du formulaire
     $titre = htmlspecialchars(trim($_POST['titre'] ?? ''));
